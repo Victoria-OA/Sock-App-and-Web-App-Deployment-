@@ -238,7 +238,7 @@ workflows:
   version: 2
   django-deployment:
     jobs:
-       - terraform-initial
+       - terraform-initial:
        - terraform-planning:
            requires: ["terraform-initial"]
        - hold-apply:
@@ -246,7 +246,7 @@ workflows:
            requires: ["terraform-planning"]
        - terraform-apply:
            requires: ["hold-applying"]
-       terraform-stop:
+       - terraform-stop:
            requires: ["terraform-applying"]
       - hold-destroy:
           type: approval
