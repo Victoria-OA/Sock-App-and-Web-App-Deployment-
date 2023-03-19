@@ -236,7 +236,7 @@ jobs:
             
 workflows:
   version: 2
-  django-deployment:
+  blog-app-deployment:
     jobs:
        - terraform-initial:
        - terraform-planning:
@@ -248,10 +248,10 @@ workflows:
            requires: ["hold-applying"]
        - terraform-stop:
            requires: ["terraform-applying"]
-      - hold-destroy:
+       - hold-destroy:
           type: approval
           requires: ["terraform-stop"]
-      - terraform-destroy:
+       - terraform-destroy:
           requires: ["hold-destroy"]  
        - build-django-app:
             requires: ["terraform-applying"]
