@@ -1,3 +1,5 @@
+
+
 version: 2.1
 orbs:
   slack: circleci/slack@4.10.1
@@ -97,7 +99,7 @@ jobs:
           name: terraform create destroy plan
           command: |
             cd terraform
-            terraform plan -destroy -out tfdestroy
+            terraform plan -destroy -out tfdestroy 
           when: on_fail
       - persist_to_workspace:
           root: .
@@ -115,7 +117,7 @@ jobs:
           name: terraform destroy
           command: |
             cd terraform
-            terraform apply -auto-approve tfdestroy
+            terraform destroy -auto-approve tfdestroy
 # CONFIGURE INFRASTRUCTURE
   container-configurations:
     docker:
@@ -131,6 +133,7 @@ jobs:
       - run:
           name: Configure server
           command: |
+            # Your code here
             cd .circleci/ansible
             ansible-playbook -i inventory.1 container-configurations.yml
   build-blog-app_web-app:
@@ -154,12 +157,12 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            cd blog-app  
+            cd django_project  
             docker build -t blog-app-app .
       - run:
           name: Push to Docker Hub
           command: |
-            cd blog-app
+            cd django_project
             echo "$DOCKER_PASSWORD"
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker tag $APP:latest $DOCKER_USERNAME/$APP
@@ -184,8 +187,8 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes_django/*yaml
-            kubectl apply -f kubernetes/
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes_cluster/*yml
+            kubectl apply -f kubernetes_cluster/
             kubectl get pods
             kubectl get services
             
@@ -208,9 +211,10 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes_sock-shop/*yaml
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes/*yaml
             kubectl create namespace sock-shop
-            kubectl apply -f kubernetes_sock-shop/
+            kubectl apply -f kubernetes/
+            kubectl get services namespace=sock-shop
             
   deploy-prometheus:
     docker:
@@ -231,33 +235,33 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes_sock-shop/manifests-monitoring/*yaml
-            kubectl apply -f kubernetes_sock-shop/manifests-monitoring/
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes/manifests-monitoring/*yaml
+            kubectl apply -f kubernetes/manifests-monitoring/
             
 workflows:
   version: 2
-  blog-app-deployment:
+  blog-app_web-deployment:
     jobs:
-       - terraform-initial:
+       - terraform-initial
        - terraform-planning:
            requires: ["terraform-initial"]
-       - hold-apply:
+       - hold-applying:
            type: approval
            requires: ["terraform-planning"]
-       - terraform-apply:
+       - terraform-applying:
            requires: ["hold-applying"]
        - terraform-stop:
            requires: ["terraform-applying"]
        - hold-destroy:
-          type: approval
-          requires: ["terraform-stop"]
+           type: approval
+           requires: ["terraform-stop"]
        - terraform-destroy:
-          requires: ["hold-destroy"]  
+           requires: ["hold-destroy"]  
        - build-blog-app_web-app:
             requires: ["terraform-applying"]
-      # - deploy-django-app:
-          # requires: [terraform-apply, build-django-app]
-      # - deploy-sock-shop:
-          # requires: [terraform-apply, build-django-app]
-      # - deploy-prometheus:
-          # requires: [terraform-apply, build-django-app]
+      # - deploy-blog-app_web-app:
+       #    requires: ["terraform-applying, build-blog-app_web-app"]
+       #- deploy-sock-shop:
+        #   requires: ["terraform-applying, build-blog-app_web-app"]
+       #- deploy-prometheus:
+        #   requires: ["terraform-applying, build-blog-app_web-app"]
