@@ -133,7 +133,7 @@ jobs:
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.1 container-configurations.yml
-  build-django-app:
+  build-blog-app_web-app:
     docker:
       - image: cimg/python:3.10
     steps:
@@ -165,7 +165,7 @@ jobs:
             docker tag $APP:latest $DOCKER_USERNAME/$APP
             docker push $DOCKER_USERNAME/$APP
             
-  deploy-blog-app:
+  deploy-blog-app_web-app:
     docker:
       - image: cimg/python:3.10
     steps:
@@ -253,7 +253,7 @@ workflows:
           requires: ["terraform-stop"]
        - terraform-destroy:
           requires: ["hold-destroy"]  
-       - build-django-app:
+       - build-blog-app_web-app:
             requires: ["terraform-applying"]
       # - deploy-django-app:
           # requires: [terraform-apply, build-django-app]
