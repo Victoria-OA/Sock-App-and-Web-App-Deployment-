@@ -246,7 +246,7 @@ workflows:
            requires: ["terraform-planning"]
        - terraform-apply:
            requires: ["hold-applying"]
-       terraform-stop
+       terraform-stop:
            requires: ["terraform-applying"]
       - hold-destroy:
           type: approval
