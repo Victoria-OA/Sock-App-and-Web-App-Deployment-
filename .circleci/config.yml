@@ -2,16 +2,8 @@
 
 version: 2.1
 orbs:
-  slack: circleci/slack@4.10.1
   aws-cli: circleci/aws-cli@3.1.4
 
-commands:
-  notify_on_failure:
-    steps:
-      - slack/notify:
-          event: fail
-          channel: cicd-pipeline
-          template: basic_fail_1
 
   install_awscli:
     description: Install AWS CLI v2
@@ -22,24 +14,9 @@ commands:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-  install_ansible:
-    description: Install Ansible
-    steps:
-      - run:
-          name: Install Ansible
-          command: |
-            python3 -m pip install --user ansible
+ 
 jobs:
-  hadolint:
-    docker:
-      - image: cimg/python:3.10
-    steps:
-      - checkout
-      - run:
-          name: Test code indentation
-          command: |
-              cd django_project
-              make lint
+ 
 ## DEPLOY INFRASTRUCTURE
   terraform-initial:
     working_directory: /tmp/project
@@ -118,24 +95,7 @@ jobs:
           command: |
             cd terraform
             terraform destroy -auto-approve tfdestroy
-# CONFIGURE INFRASTRUCTURE
-  container-configurations:
-    docker:
-      - image: cimg/python:3.10
-    steps: 
-      - checkout
-      - install_awscli
-      - install_ansible
-      - add_ssh_keys:
-          fingerprints: ["56:a1:e8:28:97:7e:ea:fc:4f:6d:f7:03:95:a8:58:5d"]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Configure server
-          command: |
-            # Your code here
-            cd .circleci/ansible
-            ansible-playbook -i inventory.1 container-configurations.yml
+
   build-blog-app_web-app:
     docker:
       - image: cimg/python:3.10
@@ -165,8 +125,8 @@ jobs:
             cd django_project
             echo "$DOCKER_PASSWORD"
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker tag $APP:latest $DOCKER_USERNAME/$APP
-            docker push $DOCKER_USERNAME/$APP
+            docker tag $APP:latest $DOCKER_USERNAME/$APPLICATION
+            docker push $DOCKER_USERNAME/$APPLICATION
             
   deploy-blog-app_web-app:
     docker:
@@ -187,7 +147,7 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes_cluster/*yml
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" kubernetes_cluster/*yaml
             kubectl apply -f kubernetes_cluster/
             kubectl get pods
             kubectl get services
@@ -211,7 +171,7 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes/*yaml
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" manifest/*yaml
             kubectl create namespace sock-shop
             kubectl apply -f kubernetes/
             kubectl get services namespace=sock-shop
@@ -235,7 +195,7 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APP:latest|g" kubernetes/manifests-monitoring/*yaml
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" kubernetes/manifests-monitoring/*yaml
             kubectl apply -f kubernetes/manifests-monitoring/
             
 workflows:
