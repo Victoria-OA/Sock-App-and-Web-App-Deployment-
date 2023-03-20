@@ -199,28 +199,28 @@ jobs:
             
 workflows:
   version: 2
-  django-deployment:
-  jobs:
-      #  - terraform-initial
-      #  - terraform-planning:
-      #      requires: [terraform-initial]
-      #  - hold-apply:
-      #      type: approval
-      #      requires: [terraform-planning]
-      #  - terraform-applying:
-      #      requires: [hold-apply]
-      #  - terraform-stop:
-      #      requires: [terraform-applying]
-      #  - hold-destroy:
-      #      type: approval
-      #      requires: [terraform-stop]
-      #  - terraform-destroy:
-      #      requires: [hold-destroy]  
-      #  - build-blog-app:
-      #       requires: [terraform-applying, terraform-applying]
-      #  - deploy-blog-app:
-      #     requires: [terraform-applying, build-blog-app]
-      #  - deploy-sock-shop:
-      #     requires: [terraform-applying, build-blog-app]
-      #  - deploy-prometheus:
-      #     requires: [terraform-applying, build-blog-app]
+  blog-deployment:
+    jobs:
+      - terraform-initial
+      - terraform-planning:
+          requires: ["terraform-initial"]
+      - hold-apply:
+          type: approval
+          requires: ["terraform-planning"]
+      - terraform-applying:
+          requires: ["hold-apply"]
+      - terraform-stop:
+          requires: ["terraform-applying"]
+      - hold-destroy:
+          type: approval
+          requires: ["terraform-stop"]
+      - terraform-destroy:
+          requires: ["hold-destroy"]  
+      - build-blog-app:
+           requires: [terraform-applying]
+      - deploy-blog-app:
+          requires: [build-blog-app]
+      - deploy-sock-shop:
+          requires: [build-blog-app]
+      - deploy-prometheus:
+          requires: [build-blog-app]
