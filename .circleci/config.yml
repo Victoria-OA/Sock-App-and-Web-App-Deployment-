@@ -16,7 +16,7 @@ commands:
             sudo ./aws/install
   
 jobs:
-  terraform-init:
+  terraform-initial:
     working_directory: /tmp/project
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
@@ -32,7 +32,7 @@ jobs:
           paths:
             - .
 
-  terraform-plan:
+  terraform-planning:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
@@ -48,7 +48,7 @@ jobs:
           paths:
             - .
 
-  terraform-apply:
+  terraform-applying:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
@@ -64,7 +64,7 @@ jobs:
           paths:
             - .
       
-  terraform-plan-destroy:
+  terraform-stop:
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
@@ -120,7 +120,7 @@ jobs:
       - run:
           name: Push to Docker Hub
           command: |
-            cd build-nodejs-app
+            cd build-blog-app
             echo "$DOCKER_PASSWORD"
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker tag $APPLICATION:latest $DOCKER_USERNAME/$APPLICATION
@@ -200,23 +200,23 @@ workflows:
   version: 2
   django-deployment:
     jobs:
- #      - terraform-init
- #      - terraform-plan:
- #          requires: ["terraform-init"]
+ #      - terraform-initial
+ #      - terraform-planning:
+ #          requires: [terraform-initial]
   #     - hold-apply:
    #        type: approval
-   #        requires: ["terraform-plan"]
-    #   - terraform-apply:
-    #       requires: ["hold-apply"]
-    #   - terraform-plan-destroy:
-     #      requires: ["terraform-apply"]
+   #        requires: [terraform-planning]
+    #   - terraform-applying:
+    #       requires: [hold-apply]
+    #   - terraform-stop:
+     #      requires: [terraform-applying]
      #  - hold-destroy:
       #     type: approval
-      #     requires: ["terraform-plan-destroy"]
+      #     requires: [terraform-stop]
       # - terraform-destroy:
-      #     requires: ["hold-destroy"]  
+      #     requires: [hold-destroy]  
       # - build-blog-app:
-      #      requires: ["terraform-apply"]
+      #      requires: [terraform-applying]
       # - deploy-blog-app:
       #    requires: [build-blog-app]
       # - deploy-sock-shop:
