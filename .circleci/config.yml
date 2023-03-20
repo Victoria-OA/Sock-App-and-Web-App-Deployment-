@@ -216,7 +216,7 @@ workflows:
            requires: ["terraform-plan-destroy"]
        - terraform-destroy:
            requires: ["hold-destroy"]  
-       - build-blog-app
+       - build-blog-app:
             requires: ["terraform-apply"]
        - deploy-blog-app:
           requires: [build-blog-app]
