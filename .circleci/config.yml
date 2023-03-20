@@ -1,10 +1,9 @@
-
-
 version: 2.1
 orbs:
+  
   aws-cli: circleci/aws-cli@3.1.4
 
-
+commands:
   install_awscli:
     description: Install AWS CLI v2
     steps:
@@ -14,10 +13,10 @@ orbs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
- 
+  
 jobs:
- 
-## DEPLOY INFRASTRUCTURE
+  
+
   terraform-initial:
     working_directory: /tmp/project
     docker:
@@ -77,7 +76,6 @@ jobs:
           command: |
             cd terraform
             terraform plan -destroy -out tfdestroy 
-          when: on_fail
       - persist_to_workspace:
           root: .
           paths:
@@ -94,9 +92,9 @@ jobs:
           name: terraform destroy
           command: |
             cd terraform
-            terraform destroy -auto-approve tfdestroy
-
-  build-blog-app_web-app:
+            terraform plan -destroy -out tfdestroy
+            
+  build-blog-app:
     docker:
       - image: cimg/python:3.10
     steps:
@@ -117,18 +115,16 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            cd blog-app  
-            docker build -t blog-app-app .
+             docker build -t blog-app .
       - run:
           name: Push to Docker Hub
           command: |
-            cd django_project
             echo "$DOCKER_PASSWORD"
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker tag $APP:latest $DOCKER_USERNAME/$APPLICATION
+            docker tag $APPLICATION:latest $DOCKER_USERNAME/$APPLICATION
             docker push $DOCKER_USERNAME/$APPLICATION
             
-  deploy-blog-app_web-app:
+  deploy-blog-app:
     docker:
       - image: cimg/python:3.10
     steps:
@@ -174,7 +170,7 @@ jobs:
             sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" ss_kubernetes/*yaml
             kubectl create namespace sock-shop
             kubectl apply -f ss_kubernetes/
-            kubectl get services namespace=sock-shop
+            
             
   deploy-prometheus:
     docker:
@@ -200,15 +196,15 @@ jobs:
             
 workflows:
   version: 2
-  blog-app_web-deployment:
+  django-deployment:
     jobs:
        - terraform-initial
        - terraform-planning:
            requires: ["terraform-initial"]
-       - hold-applying:
+       - hold-apply:
            type: approval
            requires: ["terraform-planning"]
-       - terraform-applying:
+       - terraform-apply:
            requires: ["hold-applying"]
        - terraform-stop:
            requires: ["terraform-applying"]
@@ -217,11 +213,11 @@ workflows:
            requires: ["terraform-stop"]
        - terraform-destroy:
            requires: ["hold-destroy"]  
-       - build-blog-app_web-app:
+      - build-nodejs-application:
             requires: ["terraform-applying"]
-       - deploy-blog-app_web-app:
-           requires: ["build-blog-app_web-app"]
-       - deploy-sock-shop:
-           requires: ["build-blog-app_web-app"]
-       - deploy-prometheus:
-           requires: ["build-blog-app_web-app"]
+      - deploy-nodejs-application:
+          requires: [build-nodejs-application]
+      - deploy-sock-shop:
+          requires: [build-nodejs-application]
+      - deploy-prometheus:
+          requires: [build-nodejs-application]
