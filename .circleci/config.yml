@@ -196,7 +196,7 @@ jobs:
             
 workflows:
   version: 2
-  django-deployment:
+  blog-app-deployment:
     jobs:
        - terraform-initial
        - terraform-planning:
@@ -213,11 +213,11 @@ workflows:
            requires: ["terraform-stop"]
        - terraform-destroy:
            requires: ["hold-destroy"]  
-      - build-nodejs-application:
+      - build-blog-app:
             requires: ["terraform-applying"]
-      - deploy-nodejs-application:
-          requires: [build-nodejs-application]
+      - deploy-blog-app:
+          requires: [build-blog-app]
       - deploy-sock-shop:
-          requires: [build-nodejs-application]
+          requires: [build-blog-app]
       - deploy-prometheus:
-          requires: [build-nodejs-application]
+          requires: [build-blog-app]
