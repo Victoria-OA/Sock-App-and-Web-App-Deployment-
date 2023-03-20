@@ -147,8 +147,8 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" kubernetes_cluster/*yaml
-            kubectl apply -f kubernetes_cluster/
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" manifest/*yaml
+            kubectl apply -f manifest/
             kubectl get pods
             kubectl get services
             
@@ -171,9 +171,9 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" manifest/*yaml
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" ss_kubernetes/*yaml
             kubectl create namespace sock-shop
-            kubectl apply -f kubernetes/
+            kubectl apply -f ss_kubernetes/
             kubectl get services namespace=sock-shop
             
   deploy-prometheus:
@@ -195,14 +195,14 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" kubernetes/manifests-monitoring/*yaml
-            kubectl apply -f kubernetes/manifests-monitoring/
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" ss_kubernetes/manifests-monitoring/*yaml
+            kubectl apply -f ss_kubernetes/manifests-monitoring/
             
 workflows:
   version: 2
   blog-app_web-deployment:
     jobs:
-       - terraform-initial
+       - terraform-initial:
        - terraform-planning:
            requires: ["terraform-initial"]
        - hold-applying:
@@ -219,9 +219,9 @@ workflows:
            requires: ["hold-destroy"]  
        - build-blog-app_web-app:
             requires: ["terraform-applying"]
-      # - deploy-blog-app_web-app:
-       #    requires: ["terraform-applying, build-blog-app_web-app"]
-       #- deploy-sock-shop:
-        #   requires: ["terraform-applying, build-blog-app_web-app"]
-       #- deploy-prometheus:
-        #   requires: ["terraform-applying, build-blog-app_web-app"]
+       - deploy-blog-app_web-app:
+           requires: ["build-blog-app_web-app"]
+       - deploy-sock-shop:
+           requires: ["build-blog-app_web-app"]
+       - deploy-prometheus:
+           requires: ["build-blog-app_web-app"]
