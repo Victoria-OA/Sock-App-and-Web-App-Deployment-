@@ -146,8 +146,8 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" ss_kubernetes/*yaml
-            kubectl apply -f ss_kubernetes/
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" manifest/*yaml
+            kubectl apply -f manifest/
             kubectl get pods
             kubectl get services
             
@@ -170,9 +170,9 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" kubernetes/*yaml
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" ss_kubernetes/*yaml
             kubectl create namespace sock-shop
-            kubectl apply -f kubernetes/
+            kubectl apply -f ss_kubernetes/
             
             
   deploy-prometheus:
@@ -194,8 +194,8 @@ jobs:
       - run:
           name: Deploy Docker image to EKS cluster
           command: |
-            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" kubernetes/manifests-monitoring/*yaml
-            kubectl apply -f kubernetes/manifests-monitoring/
+            sed -i "s|IMAGE|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$DOCKER_USERNAME/$APPLICATION:latest|g" ss_kubernetes/manifests-monitoring/*yaml
+            kubectl apply -f ss_kubernetes/manifests-monitoring/
             
 workflows:
   version: 2
