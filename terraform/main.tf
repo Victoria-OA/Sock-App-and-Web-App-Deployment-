@@ -1,4 +1,3 @@
-
 terraform {
   required_providers {
     aws = {
@@ -11,11 +10,12 @@ terraform {
 provider "aws" {
   region     = var.region
 }
-#AWS EKS
+
+# AWS EKS
 data "aws_availability_zones" "available" {}
 
 locals {
-  cluster_name = "circleci-eks-${random_string.suffix.result}"
+  cluster_name = "kube_cluster"
 }
 
 resource "random_string" "suffix" {
@@ -27,7 +27,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
 
-  name = "circleci-vpc"
+  name = "kube-vpc"
 
   cidr = "10.0.0.0/16"
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -70,17 +70,17 @@ module "eks" {
     one = {
       name = "node-group-1"
 
-      instance_types = ["t3.small"]
+      instance_types = ["t2.medium"]
 
       min_size     = 1
       max_size     = 3
-      desired_size = 2
+      desired_size = 1
     }
 
     two = {
       name = "node-group-2"
 
-      instance_types = ["t3.small"]
+      instance_types = ["t2.medium"]
 
       min_size     = 1
       max_size     = 2
