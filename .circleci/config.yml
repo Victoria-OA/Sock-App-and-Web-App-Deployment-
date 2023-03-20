@@ -1,8 +1,7 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine.
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-orbs:
-  
+orbs: 
   aws-cli: circleci/aws-cli@3.1.4
 
 commands:
@@ -17,8 +16,6 @@ commands:
             sudo ./aws/install
   
 jobs:
-  
-
   terraform-init:
     working_directory: /tmp/project
     docker:
@@ -95,6 +92,8 @@ jobs:
           command: |
             cd terraform
             terraform plan -destroy -out tfdestroy
+            
+            
   build-blog-app:
     docker:
       - image: cimg/python:3.10
@@ -117,7 +116,7 @@ jobs:
           name: Build Docker image
           command: |
              cd blog-app
-             docker build -t blog-app .
+             docker build -t blog-app_web .
       - run:
           name: Push to Docker Hub
           command: |
@@ -201,26 +200,26 @@ workflows:
   version: 2
   django-deployment:
     jobs:
-       - terraform-init
-       - terraform-plan:
-           requires: ["terraform-init"]
-       - hold-apply:
-           type: approval
-           requires: ["terraform-plan"]
-       - terraform-apply:
-           requires: ["hold-apply"]
-       - terraform-plan-destroy:
-           requires: ["terraform-apply"]
-       - hold-destroy:
-           type: approval
-           requires: ["terraform-plan-destroy"]
-       - terraform-destroy:
-           requires: ["hold-destroy"]  
-       - build-blog-app:
-            requires: ["terraform-apply"]
-       - deploy-blog-app:
-          requires: [build-blog-app]
-       - deploy-sock-shop:
-          requires: [build-blog-app]
-       - deploy-prometheus:
-          requires: [build-blog-app]
+ #      - terraform-init
+ #      - terraform-plan:
+ #          requires: ["terraform-init"]
+  #     - hold-apply:
+   #        type: approval
+   #        requires: ["terraform-plan"]
+    #   - terraform-apply:
+    #       requires: ["hold-apply"]
+    #   - terraform-plan-destroy:
+     #      requires: ["terraform-apply"]
+     #  - hold-destroy:
+      #     type: approval
+      #     requires: ["terraform-plan-destroy"]
+      # - terraform-destroy:
+      #     requires: ["hold-destroy"]  
+      # - build-blog-app:
+      #      requires: ["terraform-apply"]
+      # - deploy-blog-app:
+      #    requires: [build-blog-app]
+      # - deploy-sock-shop:
+      #    requires: [build-blog-app]
+      # - deploy-prometheus:
+      #    requires: [build-blog-app]
