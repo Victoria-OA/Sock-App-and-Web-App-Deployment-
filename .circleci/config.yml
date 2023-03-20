@@ -216,11 +216,11 @@ workflows:
       #     requires: ["terraform-stop"]
       # - terraform-destroy:
       #     requires: ["hold-destroy"]  
-      - build-blog-app:
-           requires: [terraform-applying]
-      - deploy-blog-app:
-          requires: [build-blog-app]
-      - deploy-sock-shop:
-          requires: [build-blog-app]
-      - deploy-prometheus:
-          requires: [build-blog-app]
+      - build-blog-app
+      #      requires: [terraform-applying]
+      # - deploy-blog-app:
+      #     requires: [build-blog-app]
+      # - deploy-sock-shop:
+      #     requires: [build-blog-app]
+      # - deploy-prometheus:
+      #     requires: [build-blog-app]
