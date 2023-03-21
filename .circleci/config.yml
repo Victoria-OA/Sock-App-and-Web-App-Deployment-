@@ -218,9 +218,9 @@ workflows:
       #     requires: ["hold-destroy"]  
       #- build-blog-app
       #      requires: [terraform-applying]
-      # - deploy-blog-app
+       - deploy-blog-app
       #     requires: [build-blog-app]
-      # - deploy-sock-shop
+       - deploy-sock-shop
       #     requires: [build-blog-app]
-        - deploy-prometheus:
+        - deploy-prometheus
       #     requires: [build-blog-app]
