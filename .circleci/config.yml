@@ -201,7 +201,7 @@ workflows:
   version: 2
   blog-deployment:
     jobs:
-      # - terraform-initial
+       - terraform-initial
       # - terraform-planning:
       #     requires: ["terraform-initial"]
       # - hold-apply:
