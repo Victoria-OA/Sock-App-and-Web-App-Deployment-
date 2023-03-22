@@ -116,7 +116,7 @@ jobs:
           name: Build Docker image
           command: |
              cd blog-app
-             docker build -t $APPLICATION .
+             docker build -t blog-app .
       - run:
           name: Push to Docker Hub
           command: |
