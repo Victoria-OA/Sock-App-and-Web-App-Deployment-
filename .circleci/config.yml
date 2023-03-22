@@ -119,7 +119,6 @@ jobs:
       - run:
           name: Push to Docker Hub
           command: |
-            cd blog-app
             echo "$DOCKER_PASSWORD"
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker tag $APPLICATION:latest $DOCKER_USERNAME/$APPLICATION
