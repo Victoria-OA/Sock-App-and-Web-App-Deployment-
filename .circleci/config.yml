@@ -115,8 +115,8 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-             cd blog-app
-             docker build -t blog-app .
+       #      cd blog-app
+             docker build -t blog-app_web .
       - run:
           name: Push to Docker Hub
           command: |
