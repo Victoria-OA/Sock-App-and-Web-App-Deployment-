@@ -19,25 +19,26 @@ To use the deployment workflow and configurations provided in this repository, e
 
     Access to an AWS account with the necessary permissions to create resources like EKS clusters and IAM roles.
     Installed Docker on your local machine for building container images.
-3.     Installed kubectl for interacting with the Kubernetes cluster.
-4.     Access to a Docker Hub account for pushing Docker images.
+    Installed kubectl for interacting with the Kubernetes cluster.
+    Access to a Docker Hub account for pushing Docker images.
 
 ### Deployment Workflow
 The deployment workflow in this repository follows the steps below:
 
-1.     Terraform Initial: Initializes the Terraform configuration and provisions the initial infrastructure.
-2.     Terraform Planning: Performs a Terraform plan to preview the changes before applying them.
-3.     Hold Apply: A manual approval step to review the Terraform plan and approve the changes.
-4.     Terraform Applying: Applies the Terraform plan to create or update the infrastructure.
-5.     Terraform Stop: Stops the infrastructure by creating a destroy plan.
-6.     Hold Destroy: A manual approval step to review the destroy plan and approve the destruction of resources.
-7.     Terraform Destroy: Destroys the infrastructure based on the approved destroy plan.
-8.     Build Blog App: Builds the Docker image for the blog application.
-9.     Deploy Blog App: Deploys the blog application to the Kubernetes cluster.
-10.     Deploy Sock Shop: Deploys the Sock Shop microservices application to the Kubernetes cluster.
-11.     Deploy Prometheus: Deploys Prometheus monitoring to the Kubernetes cluster.
+     Terraform Initial: Initializes the Terraform configuration and provisions the initial infrastructure.
+     Terraform Planning: Performs a Terraform plan to preview the changes before applying them.
+     Hold Apply: A manual approval step to review the Terraform plan and approve the changes.
+     Terraform Applying: Applies the Terraform plan to create or update the infrastructure.
+     Terraform Stop: Stops the infrastructure by creating a destroy plan.
+     Hold Destroy: A manual approval step to review the destroy plan and approve the destruction of resources.
+     Terraform Destroy: Destroys the infrastructure based on the approved destroy plan.
+     Build Blog App: Builds the Docker image for the blog application.
+     Deploy Blog App: Deploys the blog application to the Kubernetes cluster.
+     Deploy Sock Shop: Deploys the Sock Shop microservices application to the Kubernetes cluster.
+     Deploy Prometheus: Deploys Prometheus monitoring to the Kubernetes cluster.
 
 Each step in the workflow is designed to be modular and can be run independently or in sequence as needed.
+
 ### Terraform Configuration
 The Terraform configuration in this repository is used to provision the required AWS infrastructure, including VPC, EKS cluster, and IAM roles. The configuration is modular and can be extended to include additional resources as needed.
 
