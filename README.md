@@ -17,8 +17,8 @@ The repository provides a comprehensive setup for deploying and managing applica
 ### Requirements
 To use the deployment workflow and configurations provided in this repository, ensure you have the following prerequisites:
 
-1.     Access to an AWS account with the necessary permissions to create resources like EKS clusters and IAM roles.
-2.     Installed Docker on your local machine for building container images.
+    Access to an AWS account with the necessary permissions to create resources like EKS clusters and IAM roles.
+    Installed Docker on your local machine for building container images.
 3.     Installed kubectl for interacting with the Kubernetes cluster.
 4.     Access to a Docker Hub account for pushing Docker images.
 
